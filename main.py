@@ -1,5 +1,5 @@
 # main.py
-from fastapi import FastAPI, Depends
+from fastapi import Depends, FastAPI, HTTPException, Response, status
 from sqlalchemy.orm import Session
 from database import Base, engine, get_db
 from models import ProdutoDB
@@ -22,7 +22,7 @@ app.add_middleware(
 
 @app.get('/produtos', response_model=list[ProdutoResponse])
 def listar_produtos(db: Session = Depends(get_db)):
-    return db.query(ProdutoDB).all()
+    return db.query(ProdutoDB).order_by(ProdutoDB.id).all()
 
 # main.py (trecho adicionado)from fastapi import HTTPException
 # GET /produtos/{id} -> consulta um produto pelo id no banco
@@ -44,10 +44,33 @@ def remover_produto(produto_id: int, db: Session = Depends(get_db)):
     return produto
 
 
-@app.post('/produtos', response_model=ProdutoResponse, status_code=201)
+@app.post(
+    "/produtos",
+    response_model=ProdutoResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 def criar_produto(produto: ProdutoCreate, db: Session = Depends(get_db)):
-    novo_produto = ProdutoDB(**produto.dict())
+    novo_produto = ProdutoDB(**produto.model_dump())
     db.add(novo_produto)
     db.commit()
     db.refresh(novo_produto)
     return novo_produto
+
+
+@app.put("/produtos/{produto_id}", response_model=ProdutoResponse)
+def atualizar_produto(
+    produto_id: int,
+    dados: ProdutoCreate,
+    db: Session = Depends(get_db),
+):
+    produto = db.query(ProdutoDB).filter(ProdutoDB.id == produto_id).first()
+    if produto is None:
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
+
+    produto.nome = dados.nome
+    produto.preco = dados.preco
+    produto.quantidade = dados.quantidade
+
+    db.commit()
+    db.refresh(produto)
+    return produto
