@@ -1,10 +1,16 @@
 # main.py
-from fastapi import Depends, FastAPI, HTTPException, Response, status
+from fastapi import Depends, FastAPI, HTTPException, Path, status
 from sqlalchemy.orm import Session
 from database import Base, engine, get_db
-from models import ProdutoDB
-from schemas import ProdutoCreate, ProdutoResponse
+from models import ProdutoDB, SaopauloDB
+from schemas import (
+    ProdutoCreate,
+    ProdutoResponse,
+    SaopauloCreate,
+    SaopauloResponse,
+)
 from fastapi.middleware.cors import CORSMiddleware
+from typing import Annotated, List
 
 Base.metadata.create_all(bind=engine)  # cria as tabelas, se ainda não existirem
 
