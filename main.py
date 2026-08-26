@@ -5,12 +5,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from database import Base, engine, get_db
-from models import ProdutoDB, SaopauloDB
+from models import LivroDB, ProdutoDB
 from schemas import (
     ProdutoCreate,
     ProdutoResponse,
-    SaopauloCreate,
-    SaopauloResponse,
+    LivroCreate,
+    LivroResponse,
 )
 
 
@@ -116,92 +116,92 @@ def remover_produto(
 
     return None
 
-@app.get('/saopaulo', response_model=List[SaopauloResponse])
-def listar_saopaulo(db: Session = Depends(get_db)):
-    return db.query(SaopauloDB).all()
+@app.get('/livros', response_model=List[LivroResponse])
+def listar_livros(db: Session = Depends(get_db)):
+    return db.query(LivroDB).order_by(LivroDB.id).all()
 
 
-@app.get('/saopaulo/{saopaulo_id}', response_model=SaopauloResponse)
-def obter_saopaulo(
-    saopaulo_id: Annotated[
+@app.get('/livros/{livro_id}', response_model=LivroResponse)
+def obter_livro(
+    livro_id: Annotated[
         int,
-        Path(title='O ID do registro', ge=1),
+        Path(title='O ID do livro', ge=1),
     ],
     db: Session = Depends(get_db),
 ):
-    saopaulo = (
-        db.query(SaopauloDB)
-        .filter(SaopauloDB.id == saopaulo_id)
+    livro = (
+        db.query(LivroDB)
+        .filter(LivroDB.id == livro_id)
         .first()
     )
 
-    if saopaulo is None:
+    if livro is None:
         raise HTTPException(
             status_code=404,
-            detail='São Paulo não encontrado',
+            detail='Livro não encontrado',
         )
 
-    return saopaulo
+    return livro
 
 
-@app.post('/saopaulo', response_model=SaopauloResponse, status_code=201)
-def criar_saopaulo(
-    saopaulo: SaopauloCreate,
+@app.post('/livros', response_model=LivroResponse, status_code=201)
+def criar_livro(
+    livro: LivroCreate,
     db: Session = Depends(get_db),
 ):
-    novo_saopaulo = SaopauloDB(**saopaulo.model_dump())
-    db.add(novo_saopaulo)
+    novo_livro = LivroDB(**livro.model_dump())
+    db.add(novo_livro)
     db.commit()
-    db.refresh(novo_saopaulo)
-    return novo_saopaulo
+    db.refresh(novo_livro)
+    return novo_livro
 
 
-@app.put('/saopaulo/{saopaulo_id}', response_model=SaopauloResponse)
-def atualizar_saopaulo(
-    saopaulo_id: Annotated[int, Path(ge=1)],
-    dados: SaopauloCreate,
+@app.put('/livros/{livro_id}', response_model=LivroResponse)
+def atualizar_livro(
+    livro_id: Annotated[int, Path(ge=1)],
+    dados: LivroCreate,
     db: Session = Depends(get_db),
 ):
-    saopaulo = (
-        db.query(SaopauloDB)
-        .filter(SaopauloDB.id == saopaulo_id)
+    livro = (
+        db.query(LivroDB)
+        .filter(LivroDB.id == livro_id)
         .first()
     )
 
-    if saopaulo is None:
+    if livro is None:
         raise HTTPException(
             status_code=404,
-            detail='São Paulo não encontrado',
+            detail='Livro não encontrado',
         )
 
-    saopaulo.nome = dados.nome
-    saopaulo.titulos = dados.titulos
-    saopaulo.cores = dados.cores
-    saopaulo.idade = dados.idade
+    livro.titulo = dados.titulo
+    livro.autor = dados.autor
+    livro.genero = dados.genero
+    livro.ano_publicacao = dados.ano_publicacao
 
     db.commit()
-    db.refresh(saopaulo)
-    return saopaulo
+    db.refresh(livro)
+    return livro
 
 
-@app.delete('/saopaulo/{saopaulo_id}', status_code=204)
-def remover_saopaulo(
-    saopaulo_id: Annotated[int, Path(ge=1)],
+@app.delete('/livros/{livro_id}', status_code=204)
+def remover_livro(
+    livro_id: Annotated[int, Path(ge=1)],
     db: Session = Depends(get_db),
 ):
-    saopaulo = (
-        db.query(SaopauloDB)
-        .filter(SaopauloDB.id == saopaulo_id)
+    livro = (
+        db.query(LivroDB)
+        .filter(LivroDB.id == livro_id)
         .first()
     )
 
-    if saopaulo is None:
+    if livro is None:
         raise HTTPException(
             status_code=404,
-            detail='São Paulo não encontrado',
+            detail='Livro não encontrado',
         )
 
-    db.delete(saopaulo)
+    db.delete(livro)
     db.commit()
 
     return None

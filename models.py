@@ -1,16 +1,16 @@
 from sqlalchemy import Column, Integer, String, Float
 from database import Base
+
 class ProdutoDB(Base):
     __tablename__ = 'produtos'
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     nome = Column(String(100), nullable=False)
     preco = Column(Float, nullable=False)
     quantidade = Column(Integer, nullable=False)
-class SaopauloDB(Base):
-    __tablename__ = 'saopaulo'
-
+class LivroDB(Base):
+    __tablename__ = 'livros'
     id = Column(Integer, primary_key=True, index=True)
-    nome = Column(String(100), nullable=False)
-    titulos = Column(Integer, nullable=False)
-    cores = Column(String(100), nullable=False)
-    idade = Column(Integer, nullable=False)
+    titulo = Column(String(100), nullable=False)
+    autor = Column(String(100), nullable=False)
+    genero = Column(String(100), nullable=False)
+    ano_publicacao = Column(Integer, nullable=False)
