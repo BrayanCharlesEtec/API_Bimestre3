@@ -1,11 +1,20 @@
-#ambientes virtuais
+# Ambientes virtuais
 venv/
 env/
 
-# cache
+# Cache do Python
+__pycache__/
+*.pyc
 
- __pycache__/
- *.pyc
+# Variáveis de ambiente
+.env
 
- #ambiente
- .env
+# Arquivos do sistema
+.vscode/
+.idea/
+
+# Banco de dados local (opcional)
+*.sqlite3
+
+# Logs
+*.log
